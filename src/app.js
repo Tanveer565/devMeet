@@ -84,25 +84,43 @@ app.delete("/deleteuser" , async (req,res) => {
 });
 
 //patch Api - TO Update the data of the user by id
-app.patch("/user", async (req,res) => {
-    const updateData = req.body;
+app.patch("/user/:userId", async (req,res) => {
+    const data = req.body;
     //taking the userId from the body
-    const userId = req.body.userId;
+    const userId = req.params?.userId;
+
 
     try{
+        //array list of fields allowed for update
+        const ALLOWED_UPDATES = [
+        "skills",
+        "about",
+        "photoUrl",
+        "age",
+        "gender"
+    ];
+
+    //ittraing throw every key passed to update and checking if 
+    //the allowed update list includes it
+    const isUpdateAllowed = Object.keys(data).every((k) =>  
+        ALLOWED_UPDATES.includes(k));
+
+    //if the field is not in the allowed update list then throw an error
+    if(!isUpdateAllowed){
+        throw new Error("Update not allowed");
+    }
         //Matching the userId in the DB by checking every _id
         //And there are lot more options to use after the update 
-        const user = await User.findByIdAndUpdate({_id: userId} , updateData, {
+        const user = await User.findByIdAndUpdate(userId, data, {
             returnDocument: 'after',
             //it will the validators on the updates.
             runValidators: true,
         });
-        console.log(user);
 
         res.send("User updated successfully");
     }
     catch(err){
-        res.status(400).send("Update Failed "+ err.message);
+        res.status(400).send("Update Failed: "+ err.message);
     }
 });
 
