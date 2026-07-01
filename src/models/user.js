@@ -9,12 +9,6 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: [2, 'First name must be at least 2 characters'],
     maxlength: [50, 'First name cannot exceed 50 characters'],
-    //validating the first name
-    validate(value){
-        if(!(/^[a-zA-Z\s\-']+$/.test(value))){
-            throw new Error("First name can only contain letters, spaces, hyphens, and apostrophes");
-        }
-      },
   },
    lastName:{
     type: String,
@@ -22,12 +16,6 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: [2, 'Last name must be at least 2 characters'],
     maxlength: [50, 'Last name cannot exceed 50 characters'],
-    //validating the last name
-    validate(value){
-        if(!(/^[a-zA-Z\s\-']+$/.test(value))){
-            throw new Error("Last name can only contain letters, spaces, hyphens, and apostrophes");
-        }
-      },
   },
   email: {
     type: String,
