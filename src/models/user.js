@@ -3,40 +3,31 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
-
     firstName: {
     type: String,
     required: [true, 'First name is required'],
     trim: true,
     minlength: [2, 'First name must be at least 2 characters'],
     maxlength: [50, 'First name cannot exceed 50 characters'],
-    validate: {
-      validator: function(v) {
-        return /^[a-zA-Z\s\-']+$/.test(v);
+    //validating the first name
+    validate(value){
+        if(!(/^[a-zA-Z\s\-']+$/.test(value))){
+            throw new Error("First name can only contain letters, spaces, hyphens, and apostrophes");
+        }
       },
-      message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
-    },
-    // Sanitization: Trim and normalize spaces
-    set: function(value) {
-      return value.trim().replace(/\s+/g, ' ');
-    }
   },
-   lastName: {
+   lastName:{
     type: String,
     required: [true, 'Last name is required'],
     trim: true,
     minlength: [2, 'Last name must be at least 2 characters'],
     maxlength: [50, 'Last name cannot exceed 50 characters'],
-    validate: {
-      validator: function(v) {
-        return /^[a-zA-Z\s\-']+$/.test(v);
+    //validating the last name
+    validate(value){
+        if(!(/^[a-zA-Z\s\-']+$/.test(value))){
+            throw new Error("Last name can only contain letters, spaces, hyphens, and apostrophes");
+        }
       },
-      message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
-    },
-    // Sanitization: Trim and normalize spaces
-    set: function(value) {
-      return value.trim().replace(/\s+/g, ' ');
-    }
   },
   email: {
     type: String,
@@ -44,30 +35,24 @@ const userSchema = new mongoose.Schema({
     unique: true,
     trim: true,
     lowercase: true,
-    validate: {
-      validator: function(v) {
-        return validator.isEmail(v);
-      },
-      message: 'Please provide a valid email address'
+    //validating the email formate
+    validate(value){
+        if(!(validator.isEmail(value))){
+            throw new Error("Invalid email address: "+value);
+        }
     },
-    // Sanitization: Trim and convert to lowercase
-    set: function(value) {
-      return value.trim().toLowerCase();
-    }
   },
 
     password: {
     type: String,
     required: [true, 'Password is required'],
-    minlength: [8, 'Password must be at least 8 characters'],
     select: false, // Don't return password in queries by default
-    validate: {
-      validator: function(v) {
-        // Password must contain at least one uppercase, one lowercase, one number, and one special character
-        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(v);
+    //validating the passwords strength
+    validate(value) {
+        if(!validator.isStrongPassword(value)) {
+            throw new Error("Password must be at least 8 characters with at least one uppercase, one lowercase, one number, and one special character (@$!%*?&)");
+        }
       },
-      message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
-    }
   },
     age: {
         type: Number,
@@ -76,6 +61,7 @@ const userSchema = new mongoose.Schema({
     Gender: {
         type: String,
         lowercase: true,
+        //validating the gender
         validate(value) {
             if(!["male","female","other"].includes(value)){
                 throw new Error("Gender data is not validated");
@@ -84,7 +70,14 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl: {
         type: String,
-        default:"https://img.magnific.com/premium-vector/default-avatar-profile-icon-gray-placeholder-vector-illustration_514344-14759.jpg?semt=ais_hybrid&w=740&q=80"
+        //default photo url
+        default:"https://img.magnific.com/premium-vector/default-avatar-profile-icon-gray-placeholder-vector-illustration_514344-14759.jpg?semt=ais_hybrid&w=740&q=80",
+        //validating the  photo url
+        validate(value){
+            if(!validator.isURL(value)){
+                throw new Error("Invalid photo URL: "+value);
+            }
+        }
 
     },
     about: {
@@ -99,15 +92,18 @@ const userSchema = new mongoose.Schema({
                 maxLength:[20]
             }
         ],
+        //validating the number elements in skills
         validate(value) {
             if(value.length>5){
                 throw new Error("You can only put a maximum of 5 skills")
             }
         }
     }
-},{
+},
+{
     timestamps:true,
-});
+}
+);
 
 const User = mongoose.model("User",userSchema);
 
