@@ -34,7 +34,6 @@ const userSchema = new mongoose.Schema({
     password: {
     type: String,
     required: [true, 'Password is required'],
-    select: false, // Don't return password in queries by default
     //validating the passwords strength
     validate(value) {
         if(!validator.isStrongPassword(value)) {
