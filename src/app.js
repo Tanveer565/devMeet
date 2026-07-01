@@ -3,6 +3,7 @@ const connectdb = require("./config/database");
 const User = require("./models/user");
 const validateSignUpData = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
 const app = express();
 
 
@@ -10,7 +11,7 @@ const app = express();
 // and converts it into a standard JavaScript object.
 app.use(express.json());
 
-//signup
+//signup API
 app.post("/signup",async (req,res) => {
 
 
@@ -40,7 +41,35 @@ app.post("/signup",async (req,res) => {
     }
 });
 
-//user 
+//login API
+app.post("/login", async (req,res) => {
+
+    try {
+        const {email , password} = req.body;
+
+        //validaitng email
+        const user = await User.findOne({email: email});
+
+        if(!user){
+            throw new Error("Invalid credentials");
+        }
+
+        //validating the password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if(isPasswordValid){
+             res.send("Login successful!");
+        }else{
+             throw new Error("Invalid credentials");
+        }
+
+    } catch (err) {
+        res.status(400).send("Error: "+ err.message);
+    }
+});
+
+
+//user API
 app.get("/user", async (req,res) => {
 
     const userEmail = req.body.email;
