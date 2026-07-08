@@ -16,7 +16,7 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async(req,res) =
     //Validating status
     const allowedStatus = ["ignored","interested"];
     if(!allowedStatus.includes(status)){
-        return res.status(400).json({message:"Invalid status type: "+status});
+        return res.status(400).json({message:status+" Status not allowed!"});
     }
 
     // validating the toUserId (is present)
@@ -56,6 +56,45 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async(req,res) =
    } catch (err) {
     res.status(400).send("Error: "+err.message);
    }
+});
+
+//review Connection request
+requestRouter.post("/request/review/:status/:requestId", userAuth, async(req,res) => {
+    try {
+
+        const logedInUser = req.user;
+        const {status, requestId} = req.params;
+
+        const allowedStatus = ["accepted","rejected"];
+        if(!allowedStatus.includes(status)){
+            return res.status(404).json({message: status+"Status not allowed!"});
+        }
+
+        const connectionRequest = await ConnectionRequest.findOne({
+            _id:requestId,
+            toUserId: logedInUser,
+            status: "interested"
+        });
+
+        if(!connectionRequest){
+            return res
+            .status(404)
+            .json({message: "Connection request not found"});
+        }
+        
+        //replacing the status of the connection request
+        connectionRequest.status = status;
+
+        const data = await connectionRequest.save();
+
+        res.json({
+            message: logedInUser.firstName+" has "+status+ " the connection request",
+            data
+        });
+
+    } catch (err) {
+        res.status(400).send("Error: "+err.message);
+    }
 });
 
 module.exports = {requestRouter};
