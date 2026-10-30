@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 const profileRouter = express.Router();
 
 //pofile/view API 
-profileRouter.get("/profile/view",userAuth ,async (req,res) => {
+profileRouter.get("/profile/view", userAuth ,async (req,res) => {
     try{
         const user = req.user;
         res.send(user);
