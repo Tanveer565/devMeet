@@ -1,4 +1,4 @@
-const express = require("Express");
+const express = require("express");
 const connectdb = require("./config/database");
 const cookieParser = require("cookie-parser");
 const {authRouter,profileRouter,requestRouter,feedRouter,userRouter} = require("./router");
